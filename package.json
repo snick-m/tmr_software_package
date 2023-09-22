@@ -1,0 +1,24 @@
+{
+  "name": "tmr_software_package",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snick-m/tmr_software_package.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snick-m/tmr_software_package/issues"
+  },
+  "homepage": "https://github.com/snick-m/tmr_software_package#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
