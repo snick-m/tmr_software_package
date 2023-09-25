@@ -1,7 +1,11 @@
 from pynput.keyboard import Key, KeyCode, Listener
-from websockets import client
+from websockets import client, exceptions as connection_exceptions
+from datetime import datetime
 
 import asyncio
+
+q = asyncio.Queue()
+loop = asyncio.new_event_loop()
 
 ws: client.WebSocketClientProtocol = None
 run = True
@@ -27,28 +31,29 @@ def arm_msg(): # A_Shoulder_WR_WL_Claw_Gantry_Spin_Cam1x_Cam1y_Cam2x_Cam2y
     return f"A_{pwm_values[2][0]}_{pwm_values[2][1]}_{pwm_values[2][2]}_{pwm_values[2][3]}_{pwm_values[2][4]}_{pwm_values[2][5]}_{pwm_values[3][0]}_{pwm_values[3][1]}_{pwm_values[3][2]}_{pwm_values[3][3]}"
 
 def process_msgs(): # Generate message and send if changed
-    global last_drive_msg, last_arm_msg, ws
+    global last_drive_msg, last_arm_msg, ws, q, loop
 
     d_msg = drive_msg()
     a_msg = arm_msg()
 
     if d_msg != last_drive_msg:
-        print(d_msg)
-        asyncio.run(ws.send(d_msg))
+        loop.call_soon_threadsafe(q.put_nowait, d_msg)
         last_drive_msg = d_msg
+        # print(d_msg)
     
     if a_msg != last_arm_msg:
-        print(a_msg)
-        asyncio.run(ws.send(a_msg))
+        loop.call_soon_threadsafe(q.put_nowait, a_msg)
         last_arm_msg = a_msg
+        # print(a_msg)
 
 def on_press(key: KeyCode):
     global run, active_keys, ws, last_drive_msg, last_arm_msg, pwm_values, allowed_keys
     
     if key == Key.esc:
         # Stop listener
+        print("Stopping listener")
         run = False
-        return run
+        loop.call_soon_threadsafe(q.put_nowait, "STOP")
 
     try: # Check if key is a letter
         key = key.char
@@ -143,14 +148,27 @@ def on_release(key: KeyCode):
     process_msgs()
 
 async def main():
-    async with client.connect("ws://localhost:8765") as websocket:
-        global ws
-        ws = websocket
-        listener = Listener(on_press=on_press, on_release=on_release)
-        listener.start()
-    
-        while run:
-            await asyncio.sleep(0.01)
+    global ws, run, q
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    async for websocket in client.connect("ws://localhost:8765"):        
+        try:
+            ws = websocket
+            print("Connected to server.")
+
+            while run: # Wait for keypress to be processed into messages to send
+                msg = await q.get()
+                if msg == "STOP":
+                    break
+                print(f"[{datetime.now()}] - {msg}")
+                await websocket.send(msg)
+
+            await websocket.close()
+            break
+        except connection_exceptions.ConnectionClosed as e:
+            print(f'Terminated', e)
+
+listener = Listener(on_press=on_press, on_release=on_release)
+listener.start()
+
+loop.run_until_complete(main())
+loop.close()
