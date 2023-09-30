@@ -4,32 +4,106 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Navi System Dashboard</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="./css/style.css">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="./scripts/tailwind.config.js"></script>
-    </head>
-    <body>
-        <!--[if lt IE 7]>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Navi System Dashboard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./scripts/tailwind.config.js"></script>
+</head>
+
+<body>
+    <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <div class="container mx-auto text-center pt-6">
-            <p class="text-xl" id="ws_status">Not Connected.</p>
-            <div class="container">
-                <canvas width="1000px" height="600px" id="arm_vis"></canvas>
+    <div class="container mx-auto text-center pt-6">
+        <p class="text-xl" id="ws_status">Not Connected.</p>
+        <div class="w-full flex flex-row justify-between">
+            <canvas class="m-2 rounded-lg w-3/6 2xl:w-4/6 h-full" id="arm_vis"></canvas>
+            <div class="font-bold m-2 rounded-lg bg-gray-500 text-white w-3/6 2xl:w-2/6 flex flex-col justify-start items-start">
+                <div class="py-4 flex flex-row justify-between w-full">
+                    <div class="px-4 flex flex-col w-full"> <!-- Left Wheels -->
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Left Wheel 1: <span id="left_wheel_1">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Left Wheel 2: <span id="left_wheel_2">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Left Wheel 3: <span id="left_wheel_3">128</span>
+                        </div>
+                    </div>
+                    <div class="px-4 flex flex-col w-full"> <!-- Right Wheels -->
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Right Wheel 1: <span id="right_wheel_1">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Right Wheel 2: <span id="right_wheel_2">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Right Wheel 3: <span id="right_wheel_3">128</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="py-4 flex flex-row justify-between w-full">
+                    <div class="px-4 flex flex-col w-full"> <!-- Arm -->
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Shoulder: <span id="shoulder">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Wrist Left: <span id="wrist_l">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Wrist Right: <span id="wrist_r">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Claw: <span id="claw">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Gantry: <span id="gantry">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Spin: <span id="spin">128</span>
+                        </div>
+                    </div>
+                    <div class="px-4 flex flex-col w-full"> <!-- Camera -->
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Cam 1 X: <span id="cam1x">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Cam 1 Y: <span id="cam1y">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Cam 2 X: <span id="cam2x">128</span>
+                        </div>
+                        <div class="flex flex-row w-full justify-between w-1/3">
+                            Cam 2 Y: <span id="cam2y">128</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-4 text-black bg-white rounded-lg flex flex-col grow self-stretch">
+                    Command Log
+                    <div id="command_log">
+                        
+                    </div>
+                </div>
             </div>
         </div>
-            
-        <script src="https://cdn.babylonjs.com/babylon.js"></script>
-        <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-        <script src="./scripts/arm_vis.js"></script>
-        <script src="./scripts/websocket.js" async defer></script>
-        
-    </body>
+    </div>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+
+    <script src="./scripts/arm_vis.js"></script>
+    <script src="./scripts/dom_vis.js"></script>
+    <script src="./scripts/websocket.js" async defer></script>
+
+</body>
+
 </html>
