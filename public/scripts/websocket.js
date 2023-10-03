@@ -11,6 +11,8 @@ ws.onclose = () => {
 }
 
 ws.onmessage = (e) => {
+    if (!validateAndLogCommand(e.data)) return; // Skip processing if invalid command
+
     if (e.data.startsWith('A')) {
         let values = e.data.slice(2).split('_').map(Number);
         displayArmPWMs(values);

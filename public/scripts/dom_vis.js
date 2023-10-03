@@ -27,3 +27,76 @@ function displayWheelPWMs(values) {
         wheel_pwm_displays[i].innerHTML = values[i];
     }
 }
+
+/* =========================== COMMAND LOG DISPLAY ========================== */
+
+const log_item = document.createElement('span');
+const log = document.getElementById('command_log');
+
+function validateAndLogCommand(command) {
+    let { valid, error } = validateCommand(command);
+    const item = log_item.cloneNode();
+    item.innerHTML = command.trim() != '' ? command : '&nbsp;';
+    item.classList.add('py-1', 'mx-2', 'my-0.5', 'hover:my-2', 'rounded-lg', 'transition-all');
+
+    if (!valid) {
+        item.classList.add('bg-yellow-300');
+        item.title = error;
+    }
+
+    log.insertBefore(item, log.firstChild);
+    return valid;
+}
+
+// A_shoulder_wristRight_wristLeft_claw_gantry_spin_cam1x_cam1y_cam2x_cam2y
+// D_leftWheel1_rightWheel1_leftWheel2_rightWheel2_leftWheel3_rightWheel3
+
+function isOutOfRange(value) {
+    return value < 0 || value > 255;
+}
+
+function validateCommand(command) {
+    if (!command.startsWith('A') && !command.startsWith('D')) {
+        return {
+            valid: false,
+            error: 'Invalid command type. Must start with A or D.'
+        };
+    } else {
+        let vals = command.slice(2).split('_');
+
+        if (command.startsWith("A")) {
+            if (vals.length != 10) {
+                return {
+                    valid: false,
+                    error: 'Arm commands must have 10 values separated by underscores.'
+                };
+            }
+        } else {
+            if (vals.length != 6) {
+                return {
+                    valid: false,
+                    error: 'Wheel commands must have 6 values separated by underscores.'
+                };
+            }
+        }
+
+        if (vals.some(isNaN)) {
+            return {
+                valid: false,
+                error: 'Command values must be numbers.'
+            };
+        }
+
+        if (vals.some(isOutOfRange)) {
+            return {
+                valid: false,
+                error: 'Command values must be between 0 and 255.'
+            };
+        }
+    }
+
+    return {
+        valid: true,
+        error: 'No Error!'
+    };
+}

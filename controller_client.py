@@ -59,6 +59,22 @@ def on_press(key: KeyCode):
         key = key.char
     except AttributeError:
         key = ''
+    
+    if key == '1': # Invalid tests
+        loop.call_soon_threadsafe(q.put_nowait, "B_128_128_128_128_128_128")
+        return
+    if key == '2':
+        loop.call_soon_threadsafe(q.put_nowait, "D_255_255_255_255_255")
+        return
+    if key == '3':
+        loop.call_soon_threadsafe(q.put_nowait, "D_v55_255_255_255_255_255")
+        return
+    if key == '4':
+        loop.call_soon_threadsafe(q.put_nowait, "A_255_255_255_255_255_255")
+        return
+    if key == '5':
+        loop.call_soon_threadsafe(q.put_nowait, "")
+        return
 
     if key not in allowed_keys or key in active_keys:
         return
