@@ -5,6 +5,8 @@ const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engi
 
 const scene = new BABYLON.Scene(engine);
 
+// Setup camera and ligths
+
 const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.75, 5, new BABYLON.Vector3(-0.5, -0.75, 0), scene);
 camera.attachControl(canvas, true);
 camera.wheelPrecision = 50;
@@ -47,7 +49,7 @@ claw_b.parent = wrist;
 
 /* ============================ WHEEL COMPONENTS ============================ */
 
-const WD = 0.35; // Wheel Diameter
+const WD = 0.35; // Wheel Size
 const wheel_y_offset = -1;
 
 const left_wheel_1 = BABYLON.MeshBuilder.CreateBox("left_wheel_1", { height: WD, width: WD, depth: 0.1 }, scene);
@@ -86,6 +88,11 @@ right_wheel_3.position.y = wheel_y_offset;
 right_wheel_3.position.z = 0.75;
 right_wheel_3.rotation.z = Math.PI / 2;
 
+
+// Objects to store the incremental values for each movable component.
+// Updated based on commands received from the server.
+// Neutral command resets to 0, positive and negative commands increment and decrement respectively.
+
 var arm_inc_values = {
     "gantry": 0,
     "spin": 0,
@@ -95,7 +102,7 @@ var arm_inc_values = {
     "claw": 0,
 };
 
-var wheel_inc_values = {
+var wheel_inc_values = { // 
     "left_wheel_1": 0,
     "left_wheel_2": 0,
     "left_wheel_3": 0,
@@ -103,6 +110,9 @@ var wheel_inc_values = {
     "right_wheel_2": 0,
     "right_wheel_3": 0
 }
+
+// Create a 30 FPS loop to update the scene based on received commands.
+// 30 FPS loop created to ensure consistent speed of movement.
 
 setInterval(() => { // Update the visualization
     gantry.position.y = clampedIncrement(gantry.position.y, arm_inc_values["gantry"], 0, 2);
@@ -122,11 +132,6 @@ setInterval(() => { // Update the visualization
     right_wheel_3.rotation.z += wheel_inc_values["right_wheel_3"];
 }, 1000 / 30); // 30 FPS
 
-// Register a render loop to repeatedly render the scene
-let cam_angle = -Math.PI / 2;
-let cam_angle_inc = 0.005;
-let cam_direction = 1;
-
 engine.runRenderLoop(function () {
     scene.render();
 });
@@ -136,6 +141,7 @@ window.addEventListener("resize", function () {
     engine.resize();
 });
 
+// Function to constrain incremental values to a range.
 function clampedIncrement(variable, increment, min, max) {
     variable = Math.min(Math.max(variable + increment, min), max);
     return variable;

@@ -1,3 +1,5 @@
+// DOM Elements that show pwm values
+
 const arm_pwm_displays = [
     document.getElementById('shoulder'),
     document.getElementById('wrist_r'),
@@ -16,6 +18,8 @@ const wheel_pwm_displays = [
     document.getElementById('right_wheel_3')
 ];
 
+// Separate functions for different packet sizes
+
 function displayArmPWMs(values) {
     for (let i = 0; i < arm_pwm_displays.length; i++) {
         arm_pwm_displays[i].innerHTML = values[i];
@@ -30,9 +34,10 @@ function displayWheelPWMs(values) {
 
 /* =========================== COMMAND LOG DISPLAY ========================== */
 
-const log_item = document.createElement('span');
+const log_item = document.createElement('span'); // Base element to display each command
 const log = document.getElementById('command_log');
 
+// Check for errors in the command packet and display it in the log appropriately
 function validateAndLogCommand(command) {
     let { valid, error } = validateCommand(command);
     const item = log_item.cloneNode();
@@ -55,6 +60,7 @@ function isOutOfRange(value) {
     return value < 0 || value > 255;
 }
 
+// Check for 4 different types of errors in the command packet and generate appropriate error messages
 function validateCommand(command) {
     if (!command.startsWith('A') && !command.startsWith('D')) {
         return {
@@ -96,7 +102,6 @@ function validateCommand(command) {
     }
 
     return {
-        valid: true,
-        error: 'No Error!'
+        valid: true
     };
 }

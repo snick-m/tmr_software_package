@@ -4,6 +4,8 @@ from datetime import datetime
 
 import asyncio
 
+# Setup asynchronous program stuff
+
 q = asyncio.Queue()
 loop = asyncio.new_event_loop()
 
@@ -39,14 +41,12 @@ def process_msgs(): # Generate message and send if changed
     if d_msg != last_drive_msg:
         loop.call_soon_threadsafe(q.put_nowait, d_msg)
         last_drive_msg = d_msg
-        # print(d_msg)
     
     if a_msg != last_arm_msg:
         loop.call_soon_threadsafe(q.put_nowait, a_msg)
         last_arm_msg = a_msg
-        # print(a_msg)
 
-def on_press(key: KeyCode):
+def on_press(key: KeyCode): # Convert key press to pwm values [Keyboard Controller mapping]
     global run, active_keys, ws, last_drive_msg, last_arm_msg, pwm_values, allowed_keys
     
     if key == Key.esc:
@@ -60,19 +60,21 @@ def on_press(key: KeyCode):
     except AttributeError:
         key = ''
     
-    if key == '1': # Invalid tests
+    # Invalid command tests
+    # Press 1-5 with controller running to test. View result in Web GUI
+    if key == '1': # Wrong Command Type 
         loop.call_soon_threadsafe(q.put_nowait, "B_128_128_128_128_128_128")
         return
-    if key == '2':
+    if key == '2': # Not enough values - Drive
         loop.call_soon_threadsafe(q.put_nowait, "D_255_255_255_255_255")
         return
-    if key == '3':
+    if key == '3': # Non-number values
         loop.call_soon_threadsafe(q.put_nowait, "D_v55_255_255_255_255_255")
         return
-    if key == '4':
+    if key == '4': # Not enough values - Arm
         loop.call_soon_threadsafe(q.put_nowait, "A_255_255_255_255_255_255")
         return
-    if key == '5':
+    if key == '5': # Blank command
         loop.call_soon_threadsafe(q.put_nowait, "")
         return
 
@@ -132,7 +134,7 @@ def on_press(key: KeyCode):
 
     process_msgs()
 
-def on_release(key: KeyCode):
+def on_release(key: KeyCode): # Reset to neutral state on release
     global pwm_values
 
     try: # Check if key is a letter
@@ -171,11 +173,11 @@ async def main():
             ws = websocket
             print("Connected to server.")
 
-            while run: # Wait for keypress to be processed into messages to send
-                msg = await q.get()
-                if msg == "STOP":
+            while run:
+                msg = await q.get() # Wait for keypress to be processed into messages to send
+                if msg == "STOP": # Graceful exit by pressing esc
                     break
-                print(f"[{datetime.now()}] - {msg}")
+                print(f"[{datetime.now()}] - {msg}") # Print timestamped command to console
                 await websocket.send(msg)
 
             await websocket.close()
